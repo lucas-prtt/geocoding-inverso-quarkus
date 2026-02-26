@@ -108,10 +108,12 @@ public class IdentificadorDeUbicacion {
     }
 
     public Provincia identificar(double latitud, double longitud) {
-            Point punto = gf.createPoint(new Coordinate(longitud, latitud));
-            @SuppressWarnings("unchecked")
+        Point punto = gf.createPoint(new Coordinate(longitud, latitud));
+        Envelope searchEnv = punto.getEnvelopeInternal();
+        searchEnv.expandBy(0.5); // 55km en grados
+        @SuppressWarnings("unchecked")
             List<Provincia> candidatas =
-                    spatialIndex.query(punto.getEnvelopeInternal());
+                    spatialIndex.query(searchEnv);
 
             for (Provincia provincia : candidatas) {
                 if (provincia.getPreparedGeom().contains(punto)) {
