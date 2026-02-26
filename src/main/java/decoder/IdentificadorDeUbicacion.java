@@ -9,7 +9,8 @@ import org.wololo.geojson.FeatureCollection;
 import org.wololo.geojson.GeoJSON;
 import org.wololo.geojson.GeoJSONFactory;
 import org.wololo.jts2geojson.GeoJSONReader;
-
+import org.locationtech.jts.index.strtree.STRtree;
+import org.locationtech.jts.geom.Envelope;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
@@ -42,6 +43,7 @@ public class IdentificadorDeUbicacion {
 
     private static IdentificadorDeUbicacion instancia;
     private final List<Provincia> provincias = new ArrayList<>();
+    private final STRtree spatialIndex = new STRtree();
     private final Provincia defaultProvincia = new Provincia(null, "Desconocida", "Desconocido", "XX");
     // Lista de provincias en memoria
     private final GeometryFactory gf = new GeometryFactory();
@@ -82,11 +84,15 @@ public class IdentificadorDeUbicacion {
             String pais = (String) feature.getProperties().get("COUNTRY");
             String iso = (String) feature.getProperties().get("ISO_1");
             // Busca el nombre de la provincia
-            provincias.add(new Provincia(geomJts, provincia, pais, iso));
+            Provincia insertProv = new Provincia(geomJts, provincia, pais, iso);
+
+            provincias.add(insertProv);
             // Guarda la provincia, sus nombres y geometria convertida a memoria
+            spatialIndex.insert(
+                    insertProv.getGeometry().getEnvelopeInternal(), insertProv
+            );
         }
-
-
+        spatialIndex.build();
     }
 
     private static String readGeoJsonFromResources(String fileName) {
@@ -103,9 +109,12 @@ public class IdentificadorDeUbicacion {
 
     public Provincia identificar(double latitud, double longitud) {
             Point punto = gf.createPoint(new Coordinate(longitud, latitud));
+            @SuppressWarnings("unchecked")
+            List<Provincia> candidatas =
+                    spatialIndex.query(punto.getEnvelopeInternal());
 
-            for (Provincia provincia : provincias) {
-                if (provincia.getGeom().contains(punto)) {
+            for (Provincia provincia : candidatas) {
+                if (provincia.getPreparedGeom().contains(punto)) {
                     return provincia;
                 }
             }
@@ -115,7 +124,7 @@ public class IdentificadorDeUbicacion {
             double distanciaMaximaGrados = 0.5; // ~55 km en grados
 
             for (Provincia provincia : provincias) {
-                double distancia = provincia.getGeom().distance(punto);
+                double distancia = provincia.getGeometry().distance(punto);
                 if (distancia < distanciaMinima) {
                     distanciaMinima = distancia;
                     provinciaMasCercana = provincia;
@@ -124,8 +133,7 @@ public class IdentificadorDeUbicacion {
 
             if (provinciaMasCercana != null && distanciaMinima <= distanciaMaximaGrados) {
                 return provinciaMasCercana;
-            }
-            */
+            }*/
             return defaultProvincia;
     }
 }
