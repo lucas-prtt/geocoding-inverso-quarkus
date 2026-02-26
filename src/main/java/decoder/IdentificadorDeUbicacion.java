@@ -118,12 +118,11 @@ public class IdentificadorDeUbicacion {
                     return provincia;
                 }
             }
-            /*
             Provincia provinciaMasCercana = null;
             double distanciaMinima = Double.MAX_VALUE;
             double distanciaMaximaGrados = 0.5; // ~55 km en grados
 
-            for (Provincia provincia : provincias) {
+            for (Provincia provincia : candidatas) {
                 double distancia = provincia.getGeometry().distance(punto);
                 if (distancia < distanciaMinima) {
                     distanciaMinima = distancia;
@@ -133,7 +132,7 @@ public class IdentificadorDeUbicacion {
 
             if (provinciaMasCercana != null && distanciaMinima <= distanciaMaximaGrados) {
                 return provinciaMasCercana;
-            }*/
+            }
             return defaultProvincia;
     }
 }
