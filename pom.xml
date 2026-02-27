@@ -5,8 +5,8 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>lprtt</groupId>
-    <artifactId>untitled</artifactId>
-    <version>1.0-SNAPSHOT</version>
+    <artifactId>geocode</artifactId>
+    <version>0.1</version>
 
     <properties>
         <maven.compiler.source>24</maven.compiler.source>
