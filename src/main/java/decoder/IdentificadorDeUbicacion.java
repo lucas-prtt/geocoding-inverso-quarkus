@@ -1,5 +1,8 @@
 package decoder;
 
+import com.esotericsoftware.kryo.Kryo;
+import com.esotericsoftware.kryo.io.Input;
+import com.esotericsoftware.kryo.io.Output;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.Geometry;
 import org.locationtech.jts.geom.GeometryFactory;
@@ -11,7 +14,8 @@ import org.wololo.geojson.GeoJSONFactory;
 import org.wololo.jts2geojson.GeoJSONReader;
 import org.locationtech.jts.index.strtree.STRtree;
 import org.locationtech.jts.geom.Envelope;
-import java.io.InputStream;
+
+import java.io.*;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
@@ -87,6 +91,7 @@ public class IdentificadorDeUbicacion {
             Provincia insertProv = new Provincia(geomJts, provincia, pais, iso);
 
             provincias.add(insertProv);
+            insertProv.buildPreparedGeometry();
             // Guarda la provincia, sus nombres y geometria convertida a memoria
             spatialIndex.insert(
                     insertProv.getGeometry().getEnvelopeInternal(), insertProv

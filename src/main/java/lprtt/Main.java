@@ -5,7 +5,7 @@ import decoder.IdentificadorDeUbicacion;
 import java.util.Random;
 
 public class Main {
-    private static final int ITERACIONES = 1_000_000;
+    private static final int ITERACIONES = 1_000;
 
     public static void main(String[] args) {
         long inicioInstancia = System.nanoTime();

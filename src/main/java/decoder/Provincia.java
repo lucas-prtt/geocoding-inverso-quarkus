@@ -8,17 +8,13 @@ import org.locationtech.jts.geom.prep.PreparedGeometryFactory;
 @Getter
 public class Provincia {
     private final Geometry geometry;
-    private final PreparedGeometry preparedGeom;
+    private PreparedGeometry preparedGeom;
     private final String iso;
     private final String provincia;
     private final String pais;
 
     public Provincia(Geometry geom, String provincia, String pais, String iso) {
         this.geometry = geom;
-        if(geom != null)
-            this.preparedGeom = PreparedGeometryFactory.prepare(geom);
-        else
-            this.preparedGeom = null;
         this.provincia = provincia;
         this.pais = pais;
         this.iso = iso;
@@ -31,6 +27,13 @@ public class Provincia {
                 ", provincia='" + provincia + '\'' +
                 ", pais='" + pais + '\'' +
                 '}';
+    }
+    public void buildPreparedGeometry(){
+        if(this.geometry != null)
+            this.preparedGeom = PreparedGeometryFactory.prepare(this.geometry);
+        else
+            this.preparedGeom = null;
+
     }
     public String toLongString() {
         return iso + ": " + provincia + ", " + pais;
