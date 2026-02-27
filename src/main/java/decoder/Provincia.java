@@ -5,24 +5,8 @@ import org.locationtech.jts.geom.Geometry;
 import org.locationtech.jts.geom.prep.PreparedGeometry;
 import org.locationtech.jts.geom.prep.PreparedGeometryFactory;
 
-
+@Getter
 public class Provincia {
-    public Geometry getGeometry() {
-        return geometry;
-    }
-
-    public String getIso() {
-        return iso;
-    }
-
-    public String getProvincia() {
-        return provincia;
-    }
-
-    public String getPais() {
-        return pais;
-    }
-
     private final Geometry geometry;
     private PreparedGeometry preparedGeom;
     private final String iso;
@@ -56,9 +40,5 @@ public class Provincia {
     }
     public String toMediumString(){
         return provincia + ", " + pais;
-    }
-
-    public PreparedGeometry getPreparedGeom() {
-        return preparedGeom;
     }
 }
