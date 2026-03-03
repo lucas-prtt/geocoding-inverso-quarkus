@@ -15,21 +15,6 @@
         <quarkus.package.type>uber-jar</quarkus.package.type>
     </properties>
 
-    <profiles>
-        <profile>
-            <id>noSlow</id>
-            <properties>
-                <quarkus.test.junit-platform.exclude-tags>slow</quarkus.test.junit-platform.exclude-tags>
-            </properties>
-        </profile>
-        <profile>
-            <id>includeSlow</id>
-            <properties>
-                <quarkus.test.junit-platform.include-tags>slow</quarkus.test.junit-platform.include-tags>
-            </properties>
-        </profile>
-    </profiles>
-
     <dependencies>
         <!-- Source: https://mvnrepository.com/artifact/org.projectlombok/lombok -->
         <dependency>
