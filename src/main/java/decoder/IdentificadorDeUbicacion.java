@@ -58,6 +58,9 @@ public class IdentificadorDeUbicacion {
         return instancia;
     }
 
+    public static IdentificadorDeUbicacion getSeparateInstance(){
+        return new IdentificadorDeUbicacion();
+    }
     private IdentificadorDeUbicacion() {
         CodeTimer timer = new CodeTimer();
         timer.start();

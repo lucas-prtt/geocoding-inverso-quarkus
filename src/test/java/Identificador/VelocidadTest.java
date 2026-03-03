@@ -2,6 +2,7 @@ package Identificador;
 
 import decoder.IdentificadorDeUbicacion;
 import io.quarkus.test.junit.QuarkusTest;
+import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 
 import java.time.Duration;
@@ -15,9 +16,8 @@ public class VelocidadTest {
     private static final int ITERACIONES = 1_000;
     @Test
     public void loadUnder2s() {
-        System.out.println("===============TESTTTTTTTTTTTTTTTTTTTTTT");
         assertTimeout(Duration.ofSeconds(2), () -> {
-            IdentificadorDeUbicacion identificadorDeUbicacion = IdentificadorDeUbicacion.getInstance();
+            IdentificadorDeUbicacion identificadorDeUbicacion = IdentificadorDeUbicacion.getSeparateInstance();
         });
     }
     @Test
