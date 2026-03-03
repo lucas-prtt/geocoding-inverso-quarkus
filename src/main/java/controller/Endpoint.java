@@ -1,7 +1,6 @@
-package lprtt;
+package controller;
 
 import decoder.IdentificadorDeUbicacion;
-import io.netty.handler.codec.http.HttpResponseStatus;
 import jakarta.ws.rs.GET;
 import jakarta.ws.rs.Path;
 import jakarta.ws.rs.Produces;
@@ -15,7 +14,7 @@ public class Endpoint {
     @Produces(MediaType.TEXT_PLAIN)
     public Response decode(@QueryParam("lat") Float lat, @QueryParam("lon") Float lon) {
         if(lat == null || lon == null){
-            return Response.status(Response.Status.BAD_REQUEST).entity("Debe incluir los queryParam \"lat\" y \"lon\"").build();
+            throw new IllegalArgumentException("Debe incluir los queryParam <lat> y <lon>");
         }
         return Response.ok(IdentificadorDeUbicacion.getInstance().identificar(lat, lon).toString()).build();
     }
