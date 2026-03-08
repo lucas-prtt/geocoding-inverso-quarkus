@@ -50,7 +50,7 @@
         <!-- Source: https://mvnrepository.com/artifact/io.quarkus/quarkus-jsonb -->
         <dependency>
             <groupId>io.quarkus</groupId>
-            <artifactId>quarkus-jsonb</artifactId>
+            <artifactId>quarkus-rest-jsonb</artifactId>
         </dependency>
     </dependencies>
 
