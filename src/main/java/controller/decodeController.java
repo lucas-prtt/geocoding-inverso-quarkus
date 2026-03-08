@@ -5,6 +5,9 @@ import decoder.IdentificadorDeUbicacion;
 import decoder.Provincia;
 import dto.DecodeDTO;
 import jakarta.inject.Inject;
+import jakarta.validation.constraints.Max;
+import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.NotNull;
 import jakarta.ws.rs.GET;
 import jakarta.ws.rs.Path;
 import jakarta.ws.rs.Produces;
@@ -19,7 +22,7 @@ public class DecodeController {
 
     @GET
     @Produces(MediaType.APPLICATION_JSON)
-    public Response decode(@QueryParam("lat") Float lat, @QueryParam("lon") Float lon) {
+    public Response decode(@QueryParam("lat") @Min(value = -90, message = "La latitud no puede ser menor a -90º") @Max(value = 90, message = "La latitud no puede ser mayor a 90º") @NotNull(message = "Debe incluir el queryParam lat") Float lat, @QueryParam("lon") @Min(value = -180, message = "La longitud no puede ser menor a -180º") @Max(value = 180, message = "La longitud no puede ser mayor a 180º") @NotNull(message = "Debe incluir el queryParam lon") Float lon) {
         if(lat == null || lon == null){
             throw new IllegalArgumentException("Debe incluir los queryParam <lat> y <lon>");
         }
