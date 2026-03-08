@@ -105,8 +105,6 @@ public class IdentificadorDeUbicacion {
     }
     @PostConstruct
     private void init() {
-        CodeTimer codeTimer = new CodeTimer();
-        codeTimer.start();
         if(!decoderConfig.useCache()){
             logger.info("Cache desactivado, cargando geometrias");
             provincias = parseGeoJson();
@@ -121,8 +119,7 @@ public class IdentificadorDeUbicacion {
             }
         }
         prepararProvincias(provincias);
-        codeTimer.stop();
-        codeTimer.printTime("Init decoder");
+        logger.info("Provincias cargadas");
     }
 
     private static String readGeoJsonFromResources(String fileName) {
