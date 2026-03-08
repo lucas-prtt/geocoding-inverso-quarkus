@@ -19,7 +19,7 @@ public class CodeTimer {
         if(end == null){
             throw new RuntimeException("No se finalizo el timer");
         }
-        return start - end;
+        return end - start;
     }
     public long timeMicro(){
         return timeNano() / 1000;

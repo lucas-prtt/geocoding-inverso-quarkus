@@ -4,22 +4,23 @@ import decoder.IdentificadorDeUbicacion;
 import io.netty.handler.logging.LogLevel;
 import io.quarkus.runtime.Startup;
 import jakarta.annotation.PostConstruct;
+import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.inject.Inject;
+import jakarta.inject.Provider;
 
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+@ApplicationScoped
 @Startup
 public class RutinaInicial {
     private static final Logger LOGGER = Logger.getLogger("RutinaInicial");
-
+    @Inject
+    IdentificadorDeUbicacion identificadorDeUbicacion;
     @PostConstruct
     void init() {
-        LOGGER.info("Cargando archivo de ubicaciones");
-        long inicio = System.nanoTime();
-        IdentificadorDeUbicacion.getInstance();
-        long fin = System.nanoTime();
-        long tiempoMs = (fin - inicio) / 1_000_000;
-        LOGGER.info(String.format("Archivo de ubicaciones cargado en %d ms", tiempoMs));
+        identificadorDeUbicacion.identificar(0, 0);
+        // Medio feo, pero fuerza a que se cargue al inicio
     }
 
 }

@@ -19,11 +19,14 @@ import jakarta.ws.rs.core.Response;
 public class DecodeController {
     @Inject
     ControllerConfig controllerConfig;
+    @Inject
+    IdentificadorDeUbicacion identificadorDeUbicacion;
+
 
     @GET
     @Produces(MediaType.APPLICATION_JSON)
     public Response decode(@QueryParam("lat") @Min(value = -90, message = "La latitud no puede ser menor a -90º") @Max(value = 90, message = "La latitud no puede ser mayor a 90º") @NotNull(message = "Debe incluir el queryParam lat") Float lat, @QueryParam("lon") @Min(value = -180, message = "La longitud no puede ser menor a -180º") @Max(value = 180, message = "La longitud no puede ser mayor a 180º") @NotNull(message = "Debe incluir el queryParam lon") Float lon) {
-        Provincia prov = IdentificadorDeUbicacion.getInstance().identificar(lat, lon);
+        Provincia prov = identificadorDeUbicacion.identificar(lat, lon);
         DecodeDTO resp = new DecodeDTO(prov, controllerConfig);
         return Response.ok(resp).build();
     }

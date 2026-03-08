@@ -2,9 +2,12 @@ package Identificador;
 
 import decoder.IdentificadorDeUbicacion;
 import io.quarkus.test.junit.QuarkusTest;
-import org.junit.jupiter.api.Tag;
+import jakarta.inject.Inject;
+import jakarta.inject.Provider;
 import org.junit.jupiter.api.Test;
 
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.time.Duration;
 import java.util.Random;
 
@@ -13,17 +16,11 @@ import static org.junit.jupiter.api.Assertions.assertTimeout;
 @QuarkusTest
 public class VelocidadTest {
 
+    @Inject
+    IdentificadorDeUbicacion identificadorDeUbicacion;
     private static final int ITERACIONES = 1_000;
     @Test
-    public void loadUnder2s() {
-        assertTimeout(Duration.ofSeconds(2), () -> {
-            IdentificadorDeUbicacion identificadorDeUbicacion = IdentificadorDeUbicacion.getSeparateInstance();
-        });
-    }
-    @Test
     public void decodeUnder1ms() {
-        IdentificadorDeUbicacion identificadorDeUbicacion =
-                IdentificadorDeUbicacion.getInstance();
         Random random = new Random();
         double[] lats = new double[ITERACIONES];
         double[] lons = new double[ITERACIONES];

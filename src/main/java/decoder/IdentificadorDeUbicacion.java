@@ -1,9 +1,15 @@
 package decoder;
 
+import config.DecoderConfig;
+import jakarta.annotation.PostConstruct;
+import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.inject.Inject;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.Geometry;
 import org.locationtech.jts.geom.GeometryFactory;
 import org.locationtech.jts.geom.Point;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.wololo.geojson.Feature;
 import org.wololo.geojson.FeatureCollection;
 import org.wololo.geojson.GeoJSON;
@@ -18,7 +24,6 @@ import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
-import java.util.concurrent.TimeUnit;
 
 
 
@@ -40,44 +45,31 @@ import java.util.concurrent.TimeUnit;
 
 
 
-
+@ApplicationScoped
 public class IdentificadorDeUbicacion {
+    @Inject
+    DecoderConfig decoderConfig;
+    @Inject
+    GeometryCache geometryCache;
+    Logger logger = LoggerFactory.getLogger(IdentificadorDeUbicacion.class);
 
     private static IdentificadorDeUbicacion instancia;
-    private final List<Provincia> provincias = new ArrayList<>();
+    private List<Provincia> provincias = new ArrayList<>();
     private final STRtree spatialIndex = new STRtree();
     private final Provincia defaultProvincia = new Provincia(null, "Desconocida", "Desconocido", "XX");
     // Lista de provincias en memoria
     private final GeometryFactory gf = new GeometryFactory();
     // Factory necesario para crear puntos y evaluarlos
 
-    public static IdentificadorDeUbicacion getInstance() {
-        if (instancia == null) {
-        instancia = new IdentificadorDeUbicacion();
-        }
-        return instancia;
-    }
-
-    public static IdentificadorDeUbicacion getSeparateInstance(){
-        return new IdentificadorDeUbicacion();
-    }
-    private IdentificadorDeUbicacion() {
-        CodeTimer timer = new CodeTimer();
-        timer.start();
+    private List<Provincia> parseGeoJson(){
+        List<Provincia> provinciasADevolver = new ArrayList<>();
         String geoJsonContent = readGeoJsonFromResources("provincias.geojson");
-        timer.stop();
-        timer.printTime("Leer Json");
-        // Lee el geoJson
-        timer.start();
         GeoJSON gj = GeoJSONFactory.create(geoJsonContent);
-        timer.stop();
-        timer.printTime("Crear Features");
-        // Crea un geoJson
         if (!(gj instanceof FeatureCollection fc)) {
             throw new IllegalArgumentException("Esperaba un FeatureCollection de provincias");
         }
-
         //Verifica que sea un "FeatureCollection"
+
         GeoJSONReader reader = new GeoJSONReader();
         int idx = 0;
         for (Feature feature : fc.getFeatures()) {
@@ -99,15 +91,38 @@ public class IdentificadorDeUbicacion {
             // Busca el nombre de la provincia
             Provincia insertProv = new Provincia(geomJts, provincia, pais, iso);
 
-            provincias.add(insertProv);
-            insertProv.buildPreparedGeometry();
-            // Guarda la provincia, sus nombres y geometria convertida a memoria
-            spatialIndex.insert(
-                    insertProv.getGeometry().getEnvelopeInternal(), insertProv
-            );
+            provinciasADevolver.add(insertProv);
         }
+        return provinciasADevolver;
+    }
 
+    private void prepararProvincias(List<Provincia> provincias){
+        provincias.forEach(p -> {
+            p.buildPreparedGeometry();
+            spatialIndex.insert(p.getGeometry().getEnvelopeInternal(), p);
+        });
         spatialIndex.build();
+    }
+    @PostConstruct
+    private void init() {
+        CodeTimer codeTimer = new CodeTimer();
+        codeTimer.start();
+        if(!decoderConfig.useCache()){
+            logger.info("Cache desactivado, cargando geometrias");
+            provincias = parseGeoJson();
+        }else{
+            if(decoderConfig.forceBuildCache() || !geometryCache.cacheExists()){
+                logger.info("Cache activado, creando cache");
+                provincias = parseGeoJson();
+                geometryCache.writeProvincias(provincias);
+            }else {
+                logger.info("Cache activado, leyendo cache");
+                provincias = geometryCache.readProvincias();
+            }
+        }
+        prepararProvincias(provincias);
+        codeTimer.stop();
+        codeTimer.printTime("Init decoder");
     }
 
     private static String readGeoJsonFromResources(String fileName) {
